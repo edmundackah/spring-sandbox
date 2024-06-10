@@ -58,9 +58,8 @@ public class OrderEndpointIT {
 
     @BeforeEach
     public void setup() {
-        String baseURI = StringUtils.join("http://localhost:", port);
 
-        RestAssured.baseURI = baseURI;
+        RestAssured.baseURI = StringUtils.join("http://localhost:", port);
     }
 
     @Test
