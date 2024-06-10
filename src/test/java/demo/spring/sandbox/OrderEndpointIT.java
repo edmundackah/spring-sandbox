@@ -12,6 +12,7 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
@@ -36,6 +37,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(KafkaProducerTestConfig.class)
 public class OrderEndpointIT {
+
+    @Value("${spring.kafka.consumer.group-id}")
+    private String consumerGroup;
+
+    @Value("${kafka.topic.order}")
+    private String orderTopic;
 
     @Autowired
     private EmbeddedKafkaBroker embeddedKafkaBroker;
@@ -62,8 +69,7 @@ public class OrderEndpointIT {
         order.setOrderId("QK12456");
         order.setQuantity(5);
 
-        String baseURI = StringUtils.join("http://localhost:", port);
-        RestAssured.baseURI = baseURI;
+        RestAssured.baseURI = StringUtils.join("http://localhost:", port);
 
         given()
                 .contentType("application/json")
@@ -73,17 +79,16 @@ public class OrderEndpointIT {
                 .then()
                 .statusCode(201);
 
-        Map<String, Object> consumerProps = new HashMap<>(KafkaTestUtils.consumerProps("testGroup", "true", embeddedKafkaBroker));
+        Map<String, Object> consumerProps = KafkaTestUtils.consumerProps(consumerGroup, "true", embeddedKafkaBroker);
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, OrderDeserializer.class);
 
         DefaultKafkaConsumerFactory<String, Order> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerProps);
         Consumer<String, Order> consumer = consumerFactory.createConsumer();
-        embeddedKafkaBroker.consumeFromAnEmbeddedTopic(consumer, "order_topic");
-        ConsumerRecord<String, Order> record = KafkaTestUtils.getSingleRecord(consumer, "order_topic");
+        embeddedKafkaBroker.consumeFromAnEmbeddedTopic(consumer, orderTopic);
+        ConsumerRecord<String, Order> record = KafkaTestUtils.getSingleRecord(consumer, orderTopic);
 
         assertEquals(record.value(), order);
-
     }
 
 }
