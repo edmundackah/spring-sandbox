@@ -31,10 +31,10 @@ public class KafkaProducerTestConfig {
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
-    @Primary
-    @Bean("TestKafkaTemplate")
-    public KafkaTemplate<String, Order> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
-    }
+//    @Primary
+//    @Bean("TestKafkaTemplate")
+//    public KafkaTemplate<String, Order> kafkaTemplate() {
+//        return new KafkaTemplate<>(producerFactory());
+//    }
 
 }
