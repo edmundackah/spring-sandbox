@@ -24,7 +24,7 @@ public class InventoryController {
 
     @GetMapping(path = "/stock/{skuCode}" , produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> stockCheck(@PathVariable(name = "skuCode" ) String skuCode) {
-        System.out.println("looking for sku " + skuCode);
+        log.debug("looking for sku {}", skuCode);
         String response = inventoryService.stockCheck(skuCode);
         return ResponseEntity.ok(response);
     }

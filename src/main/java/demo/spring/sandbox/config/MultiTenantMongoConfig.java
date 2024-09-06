@@ -8,13 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -22,30 +20,26 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MultiTenantMongoConfig {
 
-    @Autowired
-    private Environment env;
+    @Value("${mongo.uri}")
+    private String uri;
 
-    @Value("#{'${mongo.tenants}'.split(',')}")
-    private final List<String> tenants;
+    @Autowired
+    private final MultiTenantProperties tenants;
 
     private final Map<String, MongoTemplate> tenantTemplateMap = new HashMap<>();
 
     @PostConstruct
     public void initializeMongoTemplates() {
         // Load tenants from the application properties
-        for (String tenant : tenants) {
-            String databaseName = env.getProperty("multi-tenant.mongo.tenants[" + tenant + "].database");
-            String uri = env.getProperty("mongo.uri");
-
-            // Log each database name for debugging
-            log.debug("Creating MongoTemplate for tenant: {} with database: {}", tenant, databaseName);
+        tenants.getTenants().forEach((t) -> {
+            log.debug("Creating MongoTemplate for tenant: {} with database: {}", t.getTenant(), t.getDatabase());
 
             MongoClient mongoClient = MongoClients.create(uri);
-            MongoDatabaseFactory mongoDatabaseFactory = new SimpleMongoClientDatabaseFactory(mongoClient, databaseName);
+            MongoDatabaseFactory mongoDatabaseFactory = new SimpleMongoClientDatabaseFactory(mongoClient, t.getDatabase());
             MongoTemplate mongoTemplate = new MongoTemplate(mongoDatabaseFactory);
 
-            tenantTemplateMap.put(tenant, mongoTemplate);
-        }
+            tenantTemplateMap.put(t.getTenant(), mongoTemplate);
+        });
     }
 
     public MongoTemplate getMongoTemplateForTenant(String tenantId) {

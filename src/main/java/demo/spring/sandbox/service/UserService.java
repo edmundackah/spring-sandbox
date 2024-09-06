@@ -21,7 +21,7 @@ public class UserService {
         MongoTemplate mongoTemplate = mongoConfig.getMongoTemplateForTenant(tenant);
 
         // Save the user using the tenant-specific MongoTemplate
-        return mongoTemplate.save(user, "users");
+        return mongoTemplate.save(user);
     }
 
     public List<User> getAllUsers(String tenantId) {
@@ -29,6 +29,6 @@ public class UserService {
         MongoTemplate mongoTemplate = mongoConfig.getMongoTemplateForTenant(tenantId);
 
         // Retrieve users from the tenant-specific database
-        return mongoTemplate.findAll(User.class, "users");
+        return mongoTemplate.findAll(User.class);
     }
 }
