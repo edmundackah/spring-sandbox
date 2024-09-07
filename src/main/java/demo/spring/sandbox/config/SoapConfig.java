@@ -38,4 +38,18 @@ public class SoapConfig {
         webServiceTemplate.setMessageSender(new HttpComponentsMessageSender());
         return webServiceTemplate;
     }
+
+    @Bean("countryWebServiceTemplate")
+    public WebServiceTemplate countryWebServiceTemplate() {
+        WebServiceTemplate webServiceTemplate = new WebServiceTemplate();
+        webServiceTemplate.setDefaultUri("http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso");
+
+        Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
+        marshaller.setContextPath("demo.spring.sandbox.model.soap.country");
+        webServiceTemplate.setMarshaller(marshaller);
+        webServiceTemplate.setUnmarshaller(marshaller);
+
+        webServiceTemplate.setMessageSender(new HttpComponentsMessageSender());
+        return webServiceTemplate;
+    }
 }
