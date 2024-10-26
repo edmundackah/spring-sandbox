@@ -1,6 +1,6 @@
 package demo.spring.sandbox;
 
-import demo.spring.sandbox.config.KafkaProducerTestConfig;
+import demo.spring.sandbox.config.KafkaTestConfig;
 import demo.spring.sandbox.model.Order;
 import demo.spring.sandbox.serializer.OrderDeserializer;
 import io.restassured.RestAssured;
@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @AutoConfigureWireMock(port = 0)
 @EmbeddedKafka(partitions = 1, topics = { "order_topic" })
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(KafkaProducerTestConfig.class)
+@Import(KafkaTestConfig.class)
 public class OrderEndpointIT {
 
     @Value("${spring.kafka.consumer.group-id}")
@@ -57,7 +57,6 @@ public class OrderEndpointIT {
 
     @BeforeEach
     public void setup() {
-
         RestAssured.baseURI = StringUtils.join("http://localhost:", port);
     }
 

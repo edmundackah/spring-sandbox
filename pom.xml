@@ -153,17 +153,6 @@
 							<sourceDestDir>${project.build.directory}/generated-sources/</sourceDestDir>
 						</configuration>
 					</execution>
-					<execution>
-						<id>country-wsdl</id>
-						<goals>
-							<goal>wsimport</goal>
-						</goals>
-						<configuration>
-							<packageName>demo.spring.sandbox.model.soap.country</packageName>
-							<wsdlDirectory>${project.basedir}/src/main/resources/wsdl/country</wsdlDirectory>
-							<sourceDestDir>${project.build.directory}/generated-sources/</sourceDestDir>
-						</configuration>
-					</execution>
 				</executions>
 			</plugin>
 		</plugins>
