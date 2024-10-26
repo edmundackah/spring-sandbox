@@ -18,7 +18,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -42,13 +41,16 @@ public class InventoryListenerTest {
     public void testOrderListener() throws Exception {
         InventoryClientStub.stubInventoryCall("SK123232", 1);
 
-        Order order = new Order();
-        order.setOrderId("SK123232");
+        Order order = Order.builder()
+                .orderId("SK123232")
+                .quantity(5)
+                .build();
 
         kafkaTemplate.send("order-topic", order);
 
-        latch.await(10, TimeUnit.SECONDS);
+        latch.await(5, TimeUnit.SECONDS);
 
-        verify(getRequestedFor(urlEqualTo("/item/SK123232")));
+        verify(1, getRequestedFor(urlEqualTo("/item/SK123232"))
+                .withHeader("Content-Type", equalTo("application/json")));
     }
 }

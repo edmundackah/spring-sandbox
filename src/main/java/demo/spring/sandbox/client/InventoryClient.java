@@ -24,6 +24,7 @@ public class InventoryClient {
 
         try {
             HttpResponse<String> response = Unirest.get(url + endpoint)
+                    .header("Content-Type", "application/json")
                     .asString();
 
             if (response.getStatus() == 200) {
